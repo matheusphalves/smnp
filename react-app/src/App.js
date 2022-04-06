@@ -1,47 +1,60 @@
 import './App.css';
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
-import { useState } from 'react';
+import ClayButton from '@clayui/button';
+import ClayCard from '@clayui/card';
+import ClayForm, { ClayInput } from '@clayui/form';
+import React, { useState } from 'react';
 
 function App() {
-  const [informations, setInformations] = useState()
+  const [hosts, setHosts] = useState([])
+
+  function insertHost(e) {
+    e.preventDefault();
+
+    setHosts([...hosts, {
+      ip: document.getElementById("ip").value,
+      hostName: "LocalHost", //substituir por um get que pega o oid no pc
+      response: ""
+    }])
+  }
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>SNMP</h1>
-        <Form>
-          <div key={`inline-radio`} className="mb-3">
-            <Form.Check
-              inline
-              label="Temperatura"
-              name="group1"
-              type="radio"
-              id={`inline-radio-1`}
+    <>
+      <h1>SNMP</h1>
+        <ClayForm onSubmit={insertHost}>
+          <ClayForm.Group>
+            <ClayInput
+              id="ip"
+              placeholder="Ip"
+              type="text"
             />
-            <Form.Check
-              inline
-              label="HostName"
-              name="group1"
-              type="radio"
-              id={`inline-radio-2`}
-            />
-            <Form.Check
-              inline
-              label="Other Information"
-              name="group1"
-              type="radio"
-              id={`inline-radio-3`}
-            />
-          </div>
-        </Form>
-        <Button variant="primary" onClick={() => setInformations("informações vindas do agente!!!")}>Buscar Informação</Button>
-
-        {
-          informations
-        }
-      </header>
-    </div>
+          </ClayForm.Group>
+          <ClayButton className="mt-3 mb-4" type='submit' displayType="primary">
+            Add
+          </ClayButton>
+        </ClayForm>
+      {
+        hosts.map((host, index) => (
+          <ClayCard key={index}>
+            <ClayCard.Body>
+              <ClayCard.Description displayType="title">
+                <strong>{host.hostName}</strong>
+              </ClayCard.Description>
+              {host.ip}
+              <ClayInput
+                className="mt-4"
+                id="basicInputText"
+                placeholder="Insert your OID"
+                type="text"
+              />
+              <ClayButton className="mt-2">{"Get"}</ClayButton>
+              <ClayCard.Description className="mt-4" truncate={false} displayType="text">
+                {host.response}
+              </ClayCard.Description>
+            </ClayCard.Body>
+          </ClayCard>
+        ))
+      }
+    </>
   );
 }
 
