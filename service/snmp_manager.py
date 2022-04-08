@@ -146,7 +146,7 @@ class SnmpManager():
             varBindTitle = varBindList[0].strip()
             varBindName = varBindList[1].strip()
             varBindValue = varBindList[2].strip()
-
+        print(fullMessage)
         finalMsg = varBindTitle + '\n' + varBindName + '\n' + varBindValue
         logging.info(finalMsg)
-        return {'var_bind_title': varBindTitle, varBindName: varBindValue}
+        return {'var_bind_title': varBindTitle, 'value': varBindValue}
