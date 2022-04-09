@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS, cross_origin
 import logging
 from service.snmp_manager import SnmpManager
+from service.check_health import check_health
 
 
 app = Flask(__name__)
@@ -31,6 +32,13 @@ def get_request_params():
     logging.info(f'Sending GET REQUEST to ({ip_address}, {community}, {oid})')
     status, oid_response = snmp.get_request(ip_address=ip_address, community=community, oid=oid) 
     return {'status': status, 'response': oid_response} 
+
+@app.route('/health', methods=['GET'])
+@cross_origin()
+def check_agent_health():
+    ip_address = request.args.get('ip_address')
+    logging.info(f'Checking availablity of {ip_address}')
+    return check_health(ip_address)
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=8080)
