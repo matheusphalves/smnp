@@ -3,7 +3,7 @@ Simple management network protocol implementation.
 
 # How to run
 
-Install the folowing packages
+Install the following packages
 
 ```
 pip install virtualenv
@@ -33,13 +33,14 @@ Pretty text
 ## Get oid info
 
 
-```POST URL_API/get_oid_info```: Pretty test
+```POST URL_API/get_request```: Pretty test
 
 ### **Request body (example)**
 ```
 {
-    "ip_address": "192.168.5.1",
-    "oid_list": ["1.3.6.1.4.1.343", "1.3.6.1.4.1.343"]
+    "ip_address": "127.0.0.1",
+    "community": "public",
+    "oid": "1.3.6.1.2.1.1.1.0"
 }
 ```
 
@@ -48,7 +49,16 @@ Pretty text
 HTTP Status Code: **200 OK**
 ```
 {
-    "expiration_time": "Thu, 21 Oct 2021 17:19:57 GMT",
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTYzNDg0NzU5Ny43MTc1NDd9.S6PP67fhJfUIoCf1OYj2dDGYZzHYxG-y1sESd-N9UCs"
+    "response": {
+        "community": "public",
+        "error_index": "0",
+        "error_status": "noError",
+        "name": "1.3.6.1.2.1.2.2.1.1.11",
+        "request_id": "1",
+        "type": "number",
+        "value": "11",
+        "version": "version-1"
+    },
+    "status": true
 }
 ```

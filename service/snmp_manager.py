@@ -6,7 +6,7 @@ from pyasn1.codec.ber import decoder
 from pysnmp.proto import api
 
 class SnmpManager():
-    '''Class define ....'''
+    '''Class provide an SNMP Manager instance to handle protocol's requests.'''
 
     def __init__(self, timeout,  port = 161) -> None:
         self.port = port
@@ -43,6 +43,7 @@ class SnmpManager():
                     snmp_response = self.snmp_socket.recv(2000)
                     #snmp_response = str(snmp_response, 'ISO-8859-1')
                     logging.info('SNMP Message received!')
+                    #parsed_json = json.loads(snmp_response.decode('utf-8'))
                     json_response = self.__handle_snmp_response(snmp_response)
                     status = True
                     break
@@ -135,18 +136,27 @@ class SnmpManager():
             if msgVer in api.protoModules:
                 pMod = api.protoModules[msgVer]
             else:
-                print('Unsupported SNMP version %s' % msgVer)
-                return
+                logging.info('Unsupported SNMP version %s' % msgVer)
+                return {}
 
             reqMsg, wholeMsg = decoder.decode(wholeMsg, asn1Spec=pMod.Message())
             fullMessage = str(reqMsg)
-            varBind = fullMessage.split('VarBindList:')[-1]
-            varBind = varBind.replace('value=ObjectSyntax:', '').replace('simple=SimpleSyntax:', '')
-            varBindList = varBind.strip().split("\n",2)
-            varBindTitle = varBindList[0].strip()
-            varBindName = varBindList[1].strip()
-            varBindValue = varBindList[2].strip()
+            dict_get_response = {}
+            try:
+                msg_itens = fullMessage.split('\n')
+                dict_get_response = {
+                    'version': msg_itens[1].split('=')[1],
+                    'community': msg_itens[2].split('=')[1],
+                    'type': msg_itens[13].split('=')[0].strip(),
+                    'value': msg_itens[13].split('=')[1],
+                    'name': msg_itens[10].split('=')[1],
+                    'request_id': msg_itens[5].split('=')[1],
+                    'error_status': msg_itens[6].split('=')[1],
+                    'error_index': msg_itens[7].split('=')[1]
+                }
+            except Exception as ex:
+                logging.info('Error during parsing SNMP response message')
+                logging.error(ex)
 
-        finalMsg = varBindTitle + '\n' + varBindName + '\n' + varBindValue
-        logging.info(finalMsg)
-        return {'var_bind_title': varBindTitle, varBindName: varBindValue}
+        logging.info(fullMessage)
+        return dict_get_response

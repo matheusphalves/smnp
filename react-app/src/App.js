@@ -20,17 +20,13 @@ function App() {
   function post(e) {
     e.preventDefault();
     
-    fetch("http://127.0.0.1:8080/get_request", {
-      method: 'POST',
-      mode: 'no-cors',
-      headers:{'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        'ip_address': '127.0.0.1',
-        'community': 'public',
-        'oid': '1.3.6.1.2.1.1.5.0'
-      })
+    fetch("http://127.0.0.1:8080/get_request?ip_address=127.0.0.1&community=public&oid=1.3.6.1.2.1.1.5.0")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data)
+      console.log(data.response.value)
+      console.log(data.response.value)
     })
-    .then((response) => {console.log(response)})
     .catch((error) => console.log( error.response.request._response ) );
   }
 
