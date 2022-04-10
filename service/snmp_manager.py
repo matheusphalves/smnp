@@ -18,7 +18,6 @@ class SnmpManager():
         try:
             logging.info('Creating SNMP socket...')
             self.snmp_socket = socket.socket(socket.AF_INET, type=socket.SOCK_DGRAM)
-            #self.snmp_socket.bind((self.address, self.port))
             self.snmp_socket.settimeout(self.timeout)
             self.is_ready = True
         except Exception as ex:
@@ -41,9 +40,7 @@ class SnmpManager():
             while True:
                 try: 
                     snmp_response = self.snmp_socket.recv(2000)
-                    #snmp_response = str(snmp_response, 'ISO-8859-1')
                     logging.info('SNMP Message received!')
-                    #parsed_json = json.loads(snmp_response.decode('utf-8'))
                     json_response = self.__handle_snmp_response(snmp_response)
                     status = True
                     break

@@ -3,46 +3,43 @@ import ClayButton from '@clayui/button';
 import ClayCard from '@clayui/card';
 import ClayForm, { ClayInput } from '@clayui/form';
 import React, { useState } from 'react';
+import { get } from './Scripts/Get';
 
 function App() {
+  
   const [hosts, setHosts] = useState([])
 
-  function insertHost(e) {
-    e.preventDefault();
+  async function insertHost(ip, community) {
+
+    let value = await get(ip, community, '1.3.6.1.2.1.1.5.0')
 
     setHosts([...hosts, {
-      ip: document.getElementById("ip").value,
-      hostName: "LocalHost", //substituir por um get que pega o oid no pc
-      response: ""
+      ip: ip,
+      hostName: value,
+      community: community,
+      response: null
     }])
   }
-
-  function post(e) {
-    e.preventDefault();
-    
-    fetch("http://127.0.0.1:8080/get_request?ip_address=127.0.0.1&community=public&oid=1.3.6.1.2.1.1.5.0")
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data)
-      console.log(data.response.value)
-      console.log(data.response.value)
-    })
-    .catch((error) => console.log( error.response.request._response ) );
-  }
-
-
+  
   return (
     <>
       <h1>SNMP</h1>
-      <ClayForm onSubmit={post}>
-        <ClayForm.Group>
+      <ClayForm>
           <ClayInput
             id="ip"
             placeholder="Ip"
             type="text"
           />
-        </ClayForm.Group>
-        <ClayButton className="mt-3 mb-4" type='submit' displayType="primary">
+          <ClayInput
+            id="community"
+            placeholder="Community"
+            type="text"
+          />
+        <ClayButton className="mt-3 mb-4" 
+        onClick={() => insertHost(
+          document.getElementById("ip").value,
+          document.getElementById("community").value
+          )} displayType="primary">
           Add
         </ClayButton>
       </ClayForm>
@@ -51,13 +48,18 @@ function App() {
           <ClayCard key={index}>
             <ClayCard.Body>
               <ClayCard.Description displayType="title">
-                <strong>{host.hostName}</strong>
+                <strong>Hostname: </strong>
+                {host.hostName}
               </ClayCard.Description>
+              <strong>IP: </strong>
               {host.ip}
+              <br></br>
+              <strong>Community: </strong>
+              {host.community}
               <ClayInput
                 className="mt-4"
                 id="basicInputText"
-                placeholder="Insert your OID"
+                placeholder="Insert OID"
                 type="text"
               />
               <ClayButton className="mt-2">{"Get"}</ClayButton>
