@@ -2,7 +2,7 @@ import './App.css';
 import ClayButton from '@clayui/button';
 import ClayCard from '@clayui/card';
 import ClayForm, { ClayInput } from '@clayui/form';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { get } from './Scripts/Get';
 
 function App() {
@@ -20,7 +20,14 @@ function App() {
       response: null
     }])
   }
-  
+
+  async function getValue(host, oid){
+    let ip = host.ip
+    let community = host.community
+    let value = await get(ip, community, oid)
+    host["response"] = value
+  }
+
   return (
     <>
       <h1>SNMP</h1>
@@ -47,7 +54,7 @@ function App() {
         hosts.map((host, index) => (
           <ClayCard key={index}>
             <ClayCard.Body>
-              <ClayCard.Description displayType="title">
+              <ClayCard.Description displayType="title" value={host.hostName}>
                 <strong>Hostname: </strong>
                 {host.hostName}
               </ClayCard.Description>
@@ -58,12 +65,16 @@ function App() {
               {host.community}
               <ClayInput
                 className="mt-4"
-                id="basicInputText"
+                id="oid"
                 placeholder="Insert OID"
                 type="text"
               />
-              <ClayButton className="mt-2">{"Get"}</ClayButton>
+              <ClayButton className="mt-2" 
+              onClick={() => getValue(host,document.getElementById("oid").value)}>
+                {"Get"}
+                </ClayButton>
               <ClayCard.Description className="mt-4" truncate={false} displayType="text">
+                <strong>Response: </strong>
                 {host.response}
               </ClayCard.Description>
             </ClayCard.Body>
