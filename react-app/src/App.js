@@ -24,16 +24,16 @@ function App() {
 
   async function getOid(host, oid) {
     let response = await get(host.ip, host.community, oid)
-  
-    let newHosts = hosts.map((hostForEach) => {
-      if (hostForEach.ip === host.ip) {
-        hostForEach["response"] = response
-      }
-  
-      return hostForEach
-    })
-  
-    setHosts(newHosts)
+    
+    if(response){
+      let newHosts = hosts.map((hostForEach) => {
+        if (hostForEach.ip === host.ip) {
+          hostForEach["response"] = response
+        }
+        return hostForEach
+      })
+      setHosts(newHosts)
+    }
   }
 
   return (
