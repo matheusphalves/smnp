@@ -38,20 +38,20 @@ function App() {
     <>
       <h1>SNMP</h1>
       <ClayForm>
-          <ClayInput
-            id="ip"
-            placeholder="Ip"
-            type="text"
-          />
-          <ClayInput
-            id="community"
-            placeholder="Community"
-            type="text"
-          />
-        <ClayButton className="mt-3 mb-4" 
-        onClick={() => insertHost(
-          document.getElementById("ip").value,
-          document.getElementById("community").value
+        <ClayInput
+          id="ip"
+          placeholder="Ip"
+          type="text"
+        />
+        <ClayInput
+          id="community"
+          placeholder="Community"
+          type="text"
+        />
+        <ClayButton className="mt-3 mb-4"
+          onClick={() => insertHost(
+            document.getElementById("ip").value,
+            document.getElementById("community").value
           )} displayType="primary">
           Add
         </ClayButton>
@@ -63,6 +63,12 @@ function App() {
               <ClayCard.Description displayType="title" value={host.hostName}>
                 <strong>Hostname: </strong>
                 {host.hostName}
+                <span className="material-icons" style={{color: 'green'}}>
+                  check_circle
+                </span>
+                <span className="material-icons" style={{color: 'red'}}>
+                  cancel
+                </span>
               </ClayCard.Description>
               <strong>IP: </strong>
               {host.ip}
@@ -75,10 +81,10 @@ function App() {
                 placeholder="Insert OID"
                 type="text"
               />
-              <ClayButton className="mt-2" 
+              <ClayButton className="mt-2"
                 onClick={() => getValue(host, document.getElementById("oid").value)}>
                 {"Get"}
-                </ClayButton>
+              </ClayButton>
               <ClayCard.Description className="mt-4" truncate={false} displayType="text">
                 <strong>Response: </strong>
                 {host.response}
