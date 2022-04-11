@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react';
 import { get } from './Scripts/Get';
 
 function App() {
-  
   const [hosts, setHosts] = useState([])
 
   async function insertHost(ip, community) {
@@ -21,11 +20,18 @@ function App() {
     }])
   }
 
-  async function getValue(host, oid){
-    let ip = host.ip
-    let community = host.community
-    let value = await get(ip, community, oid)
-    host["response"] = value
+  async function getValue(host, oid) {
+    let response = await get(host.ip, host.community, oid)
+
+    let newHosts = hosts.map((hostForEach) => {
+      if (hostForEach.ip === host.ip) {
+        hostForEach["response"] = response
+      }
+
+      return hostForEach
+    })
+
+    setHosts(newHosts)
   }
 
   return (
@@ -70,7 +76,7 @@ function App() {
                 type="text"
               />
               <ClayButton className="mt-2" 
-              onClick={() => getValue(host,document.getElementById("oid").value)}>
+                onClick={() => getValue(host, document.getElementById("oid").value)}>
                 {"Get"}
                 </ClayButton>
               <ClayCard.Description className="mt-4" truncate={false} displayType="text">
