@@ -20,7 +20,6 @@ def get_request():
     oid = request_body['oid']
     logging.info(f'Sending GET REQUEST to ({ip_address}, {community}, {oid})')
     status, oid_response = snmp.get_request(ip_address=ip_address, community=community, oid=oid)
-    
     return {'status': status, 'response': oid_response} 
 
 @app.route('/get_request', methods=['GET'])
