@@ -3,50 +3,81 @@ import ClayButton from '@clayui/button';
 import ClayCard from '@clayui/card';
 import ClayForm, { ClayInput } from '@clayui/form';
 import React, { useState } from 'react';
+import { avaliability, get } from './Scripts/Get';
+import { Health } from './Components/Health';
 
 function App() {
   const [hosts, setHosts] = useState([])
 
-  function insertHost(e) {
-    e.preventDefault();
+  async function insertHost(ip, community) {
 
-    setHosts([...hosts, {
-      ip: document.getElementById("ip").value,
-      hostName: "LocalHost", //substituir por um get que pega o oid no pc
-      response: ""
-    }])
+    let value = await get(ip, community, '1.3.6.1.2.1.1.5.0')
+
+    if(value){
+      setHosts([...hosts, {
+        ip: ip,
+        hostName: value,
+        status: true,
+        community: community,
+        response: null
+      }])
+    }
   }
 
-  function post(e) {
-    e.preventDefault();
-    
-    fetch("http://127.0.0.1:8080/get_request", {
-      method: 'POST',
-      mode: 'no-cors',
-      headers:{'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        'ip_address': '127.0.0.1',
-        'community': 'public',
-        'oid': '1.3.6.1.2.1.1.5.0'
+  async function getOid(host, oid) {
+    let response = await get(host.ip, host.community, oid)
+    if(response){
+      let newHosts = hosts.map((hostForEach) => {
+        if (hostForEach.ip === host.ip) {
+          hostForEach["response"] = response
+        }
+        return hostForEach
       })
-    })
-    .then((response) => {console.log(response)})
-    .catch((error) => console.log( error.response.request._response ) );
+      setHosts(newHosts)
+    }
   }
 
+  async function refreshHost(host){
+    let hostname = await get(host.ip, host.community, '1.3.6.1.2.1.1.5.0')
+    if(hostname){
+      let newHosts = hosts.map((hostForEach) => {
+        if (hostForEach.ip === host.ip) {
+          hostForEach["hostname"] = hostname
+          hostForEach["status"] = true
+        }
+        return hostForEach
+      })
+      setHosts(newHosts)
+    }else{
+      let newHosts = hosts.map((hostForEach) => {
+        if (hostForEach.ip === host.ip) {
+          hostForEach["status"] = false
+        }
+        return hostForEach
+      })
+      setHosts(newHosts)
+    }
+  }
 
   return (
     <>
       <h1>SNMP</h1>
-      <ClayForm onSubmit={post}>
-        <ClayForm.Group>
-          <ClayInput
-            id="ip"
-            placeholder="Ip"
-            type="text"
-          />
-        </ClayForm.Group>
-        <ClayButton className="mt-3 mb-4" type='submit' displayType="primary">
+      <ClayForm>
+        <ClayInput
+          id="ip"
+          placeholder="Ip"
+          type="text"
+        />
+        <ClayInput
+          id="community"
+          placeholder="Community"
+          type="text"
+        />
+        <ClayButton className="mt-3 mb-4"
+          onClick={() => insertHost(
+            document.getElementById("ip").value,
+            document.getElementById("community").value
+          )} displayType="primary">
           Add
         </ClayButton>
       </ClayForm>
@@ -54,18 +85,29 @@ function App() {
         hosts.map((host, index) => (
           <ClayCard key={index}>
             <ClayCard.Body>
-              <ClayCard.Description displayType="title">
-                <strong>{host.hostName}</strong>
+              <ClayCard.Description displayType="title" value={host.hostName}>
+                <strong>Hostname: </strong>
+                {host.hostName}
+                <Health check = {host.status} />
+                <button className="material-icons" onClick={() => refreshHost(host)}>sync</button>
               </ClayCard.Description>
+              <strong>IP: </strong>
               {host.ip}
+              <br></br>
+              <strong>Community: </strong>
+              {host.community}
               <ClayInput
                 className="mt-4"
-                id="basicInputText"
-                placeholder="Insert your OID"
+                id="oid"
+                placeholder="Insert OID"
                 type="text"
               />
-              <ClayButton className="mt-2">{"Get"}</ClayButton>
+              <ClayButton className="mt-2"
+                onClick={() => getOid(host, document.getElementById("oid").value)}>
+                {"Get"}
+              </ClayButton>
               <ClayCard.Description className="mt-4" truncate={false} displayType="text">
+                <strong>Value: </strong>
                 {host.response}
               </ClayCard.Description>
             </ClayCard.Body>
