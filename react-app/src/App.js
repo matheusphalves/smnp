@@ -3,7 +3,8 @@ import ClayButton from '@clayui/button';
 import ClayCard from '@clayui/card';
 import ClayForm, { ClayInput } from '@clayui/form';
 import React, { useState } from 'react';
-import { get } from './Scripts/Get';
+import { avaliability, get } from './Scripts/Get';
+import { Health } from './Components/Health';
 
 function App() {
   const [hosts, setHosts] = useState([])
@@ -16,6 +17,7 @@ function App() {
       setHosts([...hosts, {
         ip: ip,
         hostName: value,
+        status: true,
         community: community,
         response: null
       }])
@@ -24,11 +26,32 @@ function App() {
 
   async function getOid(host, oid) {
     let response = await get(host.ip, host.community, oid)
-    
     if(response){
       let newHosts = hosts.map((hostForEach) => {
         if (hostForEach.ip === host.ip) {
           hostForEach["response"] = response
+        }
+        return hostForEach
+      })
+      setHosts(newHosts)
+    }
+  }
+
+  async function refreshHost(host){
+    let hostname = await get(host.ip, host.community, '1.3.6.1.2.1.1.5.0')
+    if(hostname){
+      let newHosts = hosts.map((hostForEach) => {
+        if (hostForEach.ip === host.ip) {
+          hostForEach["hostname"] = hostname
+          hostForEach["status"] = true
+        }
+        return hostForEach
+      })
+      setHosts(newHosts)
+    }else{
+      let newHosts = hosts.map((hostForEach) => {
+        if (hostForEach.ip === host.ip) {
+          hostForEach["status"] = false
         }
         return hostForEach
       })
@@ -65,12 +88,8 @@ function App() {
               <ClayCard.Description displayType="title" value={host.hostName}>
                 <strong>Hostname: </strong>
                 {host.hostName}
-                <span className="material-icons" style={{color: 'green'}}>
-                  check_circle
-                </span>
-                <span className="material-icons" style={{color: 'red'}}>
-                  cancel
-                </span>
+                <Health check = {host.status} />
+                <button className="material-icons" onClick={() => refreshHost(host)}>sync</button>
               </ClayCard.Description>
               <strong>IP: </strong>
               {host.ip}
