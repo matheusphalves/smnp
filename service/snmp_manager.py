@@ -17,8 +17,8 @@ class SnmpManager():
     def __create_socket(self) -> bool:
         try:
             logging.info('Creating SNMP socket...')
-            self.snmp_socket = socket.socket(socket.AF_INET, type=socket.SOCK_DGRAM)
-            self.snmp_socket.settimeout(self.timeout)
+            self.__snmp_socket = socket.socket(socket.AF_INET, type=socket.SOCK_DGRAM)
+            self.__snmp_socket.settimeout(self.timeout)
             self.is_ready = True
         except Exception as ex:
             logging.error(f'Error during SnmpManager initialization: {ex}') 
@@ -35,22 +35,22 @@ class SnmpManager():
 
             snmp_message = self.__build_snmp_message(oid = oid, community= community)
             logging.info(snmp_message)
-            self.snmp_socket.sendto(snmp_message, (ip_address, self.port))
+            self.__snmp_socket.sendto(snmp_message, (ip_address, self.port))
             logging.info('Frame sent! Waiting response...')
             while True:
                 try: 
-                    snmp_response = self.snmp_socket.recv(2000)
+                    snmp_response = self.__snmp_socket.recv(2000)
                     logging.info('SNMP Message received!')
                     json_response = self.__handle_snmp_response(snmp_response)
                     status = True
                     break
                 except Exception as ex:
-                    if(self.snmp_socket.timeout):
+                    if(self.__snmp_socket.timeout):
                         logging.info(f'The socket timed out ({self.timeout})')
                     else: 
                         logging.info(f'Unhandled exception: {ex}')
                     break
-            self.snmp_socket.close()
+            self.__snmp_socket.close()
 
         return status, json_response
 
