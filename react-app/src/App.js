@@ -3,7 +3,7 @@ import ClayButton from '@clayui/button';
 import ClayCard from '@clayui/card';
 import ClayForm, { ClayInput } from '@clayui/form';
 import React, { useState } from 'react';
-import { avaliability, get } from './Scripts/Get';
+import { get } from './Scripts/Get';
 import { Health } from './Components/Health';
 
 function App() {
