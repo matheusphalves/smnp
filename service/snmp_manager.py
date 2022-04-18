@@ -42,7 +42,8 @@ class SnmpManager():
                     snmp_response = self.__snmp_socket.recv(2000)
                     logging.info('SNMP Message received!')
                     json_response = self.__handle_snmp_response(snmp_response)
-                    status = True
+                    if(json_response):
+                        status = True
                     break
                 except Exception as ex:
                     if(self.__snmp_socket.timeout):
