@@ -7,6 +7,7 @@ import { get } from './Scripts/Get';
 import { Health } from './Components/Health';
 
 function App() {
+
   const [hosts, setHosts] = useState([])
 
   async function insertHost(ip, community) {
@@ -59,6 +60,10 @@ function App() {
     }
   }
 
+  function getElement(index){
+    return document.getElementById("oid"+index).value
+  }
+
   return (
     <>
       <h1>SNMP</h1>
@@ -98,12 +103,12 @@ function App() {
               {host.community}
               <ClayInput
                 className="mt-4"
-                id="oid"
+                id={"oid"+index}
                 placeholder="Insert OID"
                 type="text"
               />
               <ClayButton className="mt-2"
-                onClick={() => getOid(host, document.getElementById("oid").value)}>
+                onClick={() => getOid(host, getElement(index))}>
                 {"Get"}
               </ClayButton>
               <ClayCard.Description className="mt-4" truncate={false} displayType="text">
