@@ -28,9 +28,12 @@ def get_request_params():
     ip_address = request.args.get('ip_address')
     community = request.args.get('community')
     oid = request.args.get('oid')
-    logging.info(f'Sending GET REQUEST to ({ip_address}, {community}, {oid})')
-    status, oid_response = snmp.get_request(ip_address=ip_address, community=community, oid=oid) 
-    return {'status': status, 'response': oid_response} 
+    if(ip_address != '' and oid != ''):
+        logging.info(f'Sending GET REQUEST to ({ip_address}, {community}, {oid})')
+        status, oid_response = snmp.get_request(ip_address=ip_address, community=community, oid=oid) 
+        return {'status': status, 'response': oid_response} 
+
+    return {'status': False}, 400
 
 @app.route('/health', methods=['GET'])
 @cross_origin()
