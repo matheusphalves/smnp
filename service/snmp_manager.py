@@ -33,7 +33,7 @@ class SnmpManager():
                 logging.info('Using default community: public')
                 community = 'public'
 
-            snmp_message = self.__build_snmp_message(oid = oid, community= community)
+            snmp_message = self.__build_get_snmp_message(oid = oid, community= community)
             logging.info(snmp_message)
             self.__snmp_socket.sendto(snmp_message, (ip_address, self.port))
             logging.info('Frame sent! Waiting response...')
@@ -55,7 +55,7 @@ class SnmpManager():
 
         return status, json_response
 
-    def __build_snmp_message(self, community, oid = 'public'):
+    def __build_get_snmp_message(self, oid, community = 'public'):
         TypeVal= b'\x05'
         lenVal_b = b'\x00'
         SVal = TypeVal + lenVal_b
