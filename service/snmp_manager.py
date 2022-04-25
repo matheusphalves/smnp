@@ -1,12 +1,11 @@
-from re import I
 import socket 
 import logging
-import json
 from pyasn1.codec.ber import decoder
 from pysnmp.proto import api
 
 class SnmpManager():
-    '''Class provide an SNMP Manager instance to handle protocol's requests.'''
+    '''Class provide an SNMP Manager instance
+     to handle protocol's requests.'''
 
     def __init__(self, timeout,  port = 161) -> None:
         self.port = port
